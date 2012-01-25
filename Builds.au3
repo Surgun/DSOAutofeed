@@ -99,7 +99,7 @@ Func BuildOfType($buildtype)
 	Local $start_t = TimerInit()
 	Local $p = FindBmp($build_b[$buildid][1])
 	if TimerDiff($start_t) > 30*1000 Then
-;~ 		AddLog("FindBmp time for "&$buildtype&" = "&(TimerDiff($start_t)/1000))
+		AddLog("FindBmp time for "&$buildtype&" = "&(TimerDiff($start_t)/1000))
 		Return False
 	Endif
 	if $p = 0 Then
@@ -427,7 +427,44 @@ Func StartGame()
 	Return True
 EndFunc
 
-
+Func Search($resname, $times = '*')
+	Local $count = 0
+	Local $searcher = GetSlotTypeForTaskTarget($resname, "");
+	Local $stype = "Геолог"
+	Local $rtype = "Карта"
+	if $resname = "Сокровища" then $resname = $resname&"1"
+	if not IsArray($searcher) then $stype = "Разведчик"
+	if StringInStr($resname, "Сокровища") > 0 Then $rtype = "Сокровища"
+	While ($times == '*') Or ($count < $times )
+		ActivateStarTab(2)     ; активируем вкладку специалистов
+		Sleep(1000)
+		If Not SelectSlot($searcher, false) Then
+			If $verbose Then Err('Не найдено свободных искателей') 
+			CloseStar()	
+			Return $count
+		EndIf
+		Sleep(400)
+		if $stype = "Разведчик" then
+			ClickB0($rtype)
+			Sleep(400)
+			ClickB0($resname)
+		else
+			ClickB('Искать'&$resname)
+		endif
+		Sleep(400)
+		if $stype = "Геолог" then
+			ClickB("РесурсОк", false, false)
+			ClickB("РусРесурсОк", false, false)
+		else
+			ClickB("Искать сокровища Ок", false, false)
+			ClickB("РусИскать сокровища Ок", false, false)
+		endif
+		Sleep(200)
+		$count = $count + 1 
+	WEnd
+	CloseStar()	
+	Return $count
+EndFunc
 
 if $autologin Then
 	if StartGame() then	ActivateClient()
