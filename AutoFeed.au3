@@ -201,6 +201,7 @@ Func ActivateClient()
 	
 	Local $i, $hwnd
 	
+	AutoItSetOption("WinTitleMatchMode", 2)
 	; Ищем окно клиента игры
 	For $i = 0 To UBound($browsers) - 1          ; пробуем каждый доступный браузер
 		$clientWindow = ControlGetHandle("[TITLE:" & $browserTitle & "; CLASS:" & $browsers[$i][1] & "]", "", "[CLASS:" & $browsers[$i][2] & "]")
@@ -209,14 +210,13 @@ Func ActivateClient()
 			ExitLoop                             ; считаем, что нашли, прекращаем поиск
 		EndIf
 	Next
-	
 	; Если клиент не найден - делать нечего, выходим
 	If $clientWindow = 0 Then
 		if $verbose Then
 			Err("Не удалось найти окно клиента игры")
 			Exit
 		EndIf
-		AddLog("Не удалось найти окно клиента игры")
+;~ 		AddLog("Не удалось найти окно клиента игры")
 		Return False
 	EndIf
 	
@@ -256,7 +256,7 @@ Func ActivateClient()
 			Err("Не удалось получить положение звезды." & @CRLF & "Убедитесь, что вкладка браузера с игрой активна и в игре не открыты модальные окна (например, окно сообщений)")
 			Exit
 		Endif
-		AddLog("Не удалось получить положение звезды." & @CRLF & "Убедитесь, что вкладка браузера с игрой активна и в игре не открыты модальные окна (например, окно сообщений)")
+;~ 		AddLog("Не удалось получить положение звезды." & @CRLF & "Убедитесь, что вкладка браузера с игрой активна и в игре не открыты модальные окна (например, окно сообщений)")
 		Return False
 	EndIf
 	
@@ -731,7 +731,7 @@ EndFunc
 Func BitmapSearch($bitmap, $left = 0, $top = 0, $right = @DesktopWidth, $bottom = @DesktopHeight, $tolerance = 0, $step = 1, $hwnd = 0)
 	
 	Local $color = $bitmap[0][0], $x = $left, $y = $top, $point
-	
+	Local $start_t = TimerInit();
 	While 1
 		$point = PixelSearch($x, $y, $right, _Iif($x = $left, $bottom, $y), $color, $tolerance, $step, $hwnd) 
 		If IsArray($point) Then
@@ -747,6 +747,10 @@ Func BitmapSearch($bitmap, $left = 0, $top = 0, $right = @DesktopWidth, $bottom 
 			$x = $left
 			$y = $y + 1
 		EndIf
+		if TimerDiff($start_t) > 60*1000 Then
+			AddLog("BitmapSearch time to big and = "&(TimerDiff($start_t)/1000))
+			Return 0
+		Endif
 	WEnd
 	
 EndFunc

@@ -5,7 +5,10 @@ func AutoAccept($autoablehen = true)
 	ClickB("Сообщения", true, false)
 	Sleep(500)
 	Local $mi = 0; - номер рассматриваемого сообщения
-	Local $p = _ArraySearch($base_xy, 'Сообщение 1')
+	Local $prefix = ""
+	if $ServerInd = 3 Then $prefix = "Рус"
+	Local $p = _ArraySearch($base_xy, $prefix&'Сообщение 1')
+	
 	$cnt = 0
 	while ($mi < 6) and ($cnt < 100)
 		$cnt = $cnt + 1
@@ -20,9 +23,9 @@ func AutoAccept($autoablehen = true)
 		Endif
 		if $mType = 'Найдены сокровища' Then
 			Sleep(200)
-			ClickB0("Сообщение 1", 1, 0, $mi*25)
+			ClickB0($prefix&"Сообщение 1", 1, 0, $mi*25)
 			Sleep(500)
-			ClickB("Принять карту", false, false)
+			ClickB($prefix&"Принять карту", false, false)
 			Sleep(200)
 			ClickB0("На склад")
 		elseif $mType = 'Сражение' Then
@@ -30,7 +33,7 @@ func AutoAccept($autoablehen = true)
 			ClickB0("Удалить сообщение 1", 1, 0, $mi*25)
 		elseif $mType = 'Предложение торговли' Then
 			Sleep(200)
-			ClickB0("Сообщение 1", 1, 0, $mi*25)
+			ClickB0($prefix&"Сообщение 1", 1, 0, $mi*25)
 			Sleep(500)
 			ClickB0("Принять предложение")
 ;~ 			Если у нас нет нужного количества ресурсов, то отклоняем предложение
@@ -41,16 +44,16 @@ func AutoAccept($autoablehen = true)
 		elseif $mType = 'Подарок' Then
 			$mi = $mi + 1
 			Sleep(200)
-			ClickB0("Сообщение 1", 1, 0, $mi*25)
+			ClickB0($prefix&"Сообщение 1", 1, 0, $mi*25)
 			Sleep(500)
-			ClickB("Принять карту", false, false)
+			ClickB($prefix&"Принять карту", false, false)
 			Sleep(200)
 			ClickB0("Принять подарок")
 		elseif $mType = 'Найдена карта' Then
 			Sleep(200)
-			ClickB0("Сообщение 1", 1, 0, $mi*25)
+			ClickB0($prefix&"Сообщение 1", 1, 0, $mi*25)
 			Sleep(500)
-			ClickB("Принять карту", false, false)
+			ClickB($prefix&"Принять карту", false, false)
 		elseif $mType = 'Undefined' Then
 			$mi = $mi + 1
 		EndIf

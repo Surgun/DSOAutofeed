@@ -96,7 +96,12 @@ EndFunc
 
 Func BuildOfType($buildtype)
 	Local $buildid = _ArraySearch($build_b, $buildtype, 0, 0, 0, 3)
+	Local $start_t = TimerInit()
 	Local $p = FindBmp($build_b[$buildid][1])
+	if TimerDiff($start_t) > 30*1000 Then
+;~ 		AddLog("FindBmp time for "&$buildtype&" = "&(TimerDiff($start_t)/1000))
+		Return False
+	Endif
 	if $p = 0 Then
 		if $build_b[$buildid][2] <> '0' then $p = FindBmp($build_b[$buildid][2])
 	EndIf
@@ -189,13 +194,18 @@ EndFunc
 
 Func BuffPoint($x, $y, $bufftype = 12, $scroll = true)
 	ActivateStarTab(3)     ; активируем вкладку бафов
+	Sleep(200)
 	If Not SelectSlot($bufftype) Then
 		If $verbose Then Err('Не найден баф') 
 		CloseStar()
-		Return
+		Return false
 	EndIf
+	Sleep(500)
 	ClickP($x, $y, $scroll)
 	Sleep(500)
+	ClickP($x, $y, $scroll)
+	Sleep(4000)
+	Return True
 EndFunc
 
 Func ScrollNext()
@@ -356,7 +366,33 @@ Func StartGame()
 			ClickB('Авторизация', true, false)
 			Sleep(3000)
 		EndIf
+		MouseMove($clientPos[0] + 10 ,$clientPos[1] + 10)
+		; если нашли кнопку авторизации жмем ее и авторизуемся
+		Sleep(200)
+		if ClickB("РусЛогин", true, false) then
+			MouseMove($clientPos[0] + 10 ,$clientPos[1] + 10)
+			Sleep(400)
+			Local $pp = FindBmp('РусВвод логина', true, false)			
+			if $pp = 0 then AddLog("Не найден элемент РусВвод логина")
+			if $pp = 0 then return false
+			ClickB('РусВвод логина', true, false)
+			Sleep(400)
+			Send($login, 1)
+			Sleep(400)
+			MouseClick("left", $pp[0], $pp[1]+45);ClickB('Ввод пароля')
+			Sleep(400)
+			MouseClick("left", $pp[0], $pp[1]+45);ClickB('Ввод пароля')
+			Sleep(400)
+			Send($passwd, 1)
+			Sleep(400)
+			ClickB('РусАвторизация', true, false)
+			Sleep(4000)
+		EndIf
+		MouseMove($clientPos[0] + 10 ,$clientPos[1] + 10)
 		ClickB('Вход в игру', true, false)
+		MouseMove($clientPos[0] + 10 ,$clientPos[1] + 10)
+		ClickB('РусВход в игру', true, false) Then
+		MouseMove($clientPos[0] + 10 ,$clientPos[1] + 10)
 		$p = FindBmp("ОкСтарт", true, false)
 		$wcnt = $wcnt + 1
 		if $wcnt > 60*5 then 
@@ -391,42 +427,7 @@ Func StartGame()
 	Return True
 EndFunc
 
-Func Search($resname, $times = '*')
-	Local $count = 0
-	Local $searcher = GetSlotTypeForTaskTarget($resname, "");
-	Local $stype = "Геолог"
-	Local $rtype = "Карта"
-	if $resname = "Сокровища" then $resname = $resname&"1"
-	if not IsArray($searcher) then $stype = "Разведчик"
-	if StringInStr($resname, "Сокровища") > 0 Then $rtype = "Сокровища"
-	While ($times == '*') Or ($count < $times )
-		ActivateStarTab(2)     ; активируем вкладку специалистов
-		Sleep(1000)
-		If Not SelectSlot($searcher, false) Then
-			If $verbose Then Err('Не найдено свободных искателей') 
-			CloseStar()	
-			Return $count
-		EndIf
-		Sleep(400)
-		if $stype = "Разведчик" then
-			ClickB0($rtype)
-			Sleep(400)
-			ClickB0($resname)
-		else
-			ClickB('Искать'&$resname)
-		endif
-		Sleep(400)
-		if $stype = "Геолог" then
-			ClickB("РесурсОк")
-		else
-			ClickB("Искать сокровища Ок")
-		endif
-		Sleep(200)
-		$count = $count + 1 
-	WEnd
-	CloseStar()	
-	Return $count
-EndFunc
+
 
 if $autologin Then
 	if StartGame() then	ActivateClient()

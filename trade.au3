@@ -11,10 +11,17 @@ Func TradeHandle($myitem, $hisitem, $myqty, $hisqty)
 	ClickB0('Чат', false, false)
 	if $myitem = "" then return
 	Sleep(200)
-	ClickB("Рынок", false, false)
+	if not ClickB("Рынок", false, false) then
+		Sleep(200)
+		ClickB("РусРынок", false, false)
+	EndIf
 	Sleep(200)
 	if ClickB("Предложение на рынок", false, false) then
 		TradeStart($myitem, $hisitem, $myqty, $hisqty)
+	else
+		if ClickB("РусПредложение на рынок", false, false) then
+			TradeStart($myitem, $hisitem, $myqty, $hisqty)
+		Endif
 	Endif
 EndFunc
 
@@ -22,7 +29,7 @@ EndFunc
 Func TradeFriend($friendi, $myitem, $hisitem, $myqty, $hisqty, $qty = 1)
 	if $myitem = "" then return
 	Sleep(200)
-	ClickB0('Друзья')
+;~ 	ClickB0('Друзья')
 	$cnt = 0
 	while $cnt < $qty
 		Sleep(200)
@@ -96,6 +103,9 @@ Func TradeStart($myitem, $hisitem, $myqty, $hisqty)
 		MouseMove($p0[0], $p0[1])
 		MouseUP("left")
 	Endif
+	ClickB0('Товар+1');
+	Sleep(200)
+	ClickB0('Товар+1');
 	Sleep(200)
 	ClickB0("Ок")
 	ClickB0("Торговать")
